@@ -15,7 +15,7 @@ snake_img = pygame.transform.scale(pygame.image.load(os.path.join("greedy snake"
 body_img = pygame.transform.scale(pygame.image.load(os.path.join("greedy snake","snake_body.png")),(30,30))
 back_img = pygame.transform.scale(pygame.image.load(os.path.join("greedy snake","snake_backdrop.png")),(1000,600))
 starting_img = pygame.image.load(os.path.join("greedy snake","snake_starting_img.png"))
-
+ 
 food_imgs = [pygame.image.load(os.path.join("greedy snake","apple.png")),pygame.image.load(os.path.join("greedy snake","bananas.png")),
 pygame.image.load(os.path.join("greedy snake","donut.png")),pygame.image.load(os.path.join("greedy snake","orange.png")),pygame.image.load(os.path.join("greedy snake","taco.png")),
 pygame.image.load(os.path.join("greedy snake","watermelon.png")),pygame.image.load(os.path.join("greedy snake","strawberry.png"))]

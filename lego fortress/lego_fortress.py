@@ -8,6 +8,7 @@ H = 600
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode((W,H))
 pygame.display.set_caption("樂高堡壘")
+coin_img = pygame.image.load(os.path.join("lego fortress","legocoin.png"))
 cheese_img = pygame.image.load(os.path.join("lego fortress","cheese.png"))
 mouse_img = pygame.image.load(os.path.join("lego fortress","mouse_img.png"))
 player_img = pygame.image.load(os.path.join("lego fortress","lego_man.png"))
@@ -15,13 +16,40 @@ playerbrick_img = pygame.image.load(os.path.join("lego fortress","lego_manbrick.
 playerbomb_img = pygame.image.load(os.path.join("lego fortress","lego_manbomb.png"))
 brick_img = pygame.image.load(os.path.join("lego fortress","legobrick.png"))
 bomb_img = pygame.image.load(os.path.join("lego fortress","bomb.png"))
+treasure_img = pygame.image.load(os.path.join("lego fortress","treasure.png"))
 boom_img = pygame.transform.scale(pygame.image.load(os.path.join("lego fortress","boom.png")),(50,50))
-back_img = pygame.transform.scale(pygame.image.load(os.path.join("lego fortress","legoback.jpg")),(1000,600))
+back_img = pygame.transform.scale(pygame.image.load(os.path.join("lego fortress","legoback.png")),(1000,600))
+starting_img = pygame.image.load(os.path.join("lego fortress","legostartback.png"))
 boom_sd = pygame.mixer.Sound(os.path.join("lego fortress","boom_sd.wav"))
+bite_sd = pygame.mixer.Sound(os.path.join("lego fortress","legobite_sd.wav"))
+coin_sd = pygame.mixer.Sound(os.path.join("lego fortress","legocoin_sd.wav"))
+put_sd = pygame.mixer.Sound(os.path.join("lego fortress","legoput_sd.wav"))
+win_sd = pygame.mixer.Sound(os.path.join("lego fortress", "win.wav"))
+lose_sd = pygame.mixer.Sound(os.path.join("lego fortress", "lose.wav"))
+pygame.mixer.music.load(os.path.join("lego fortress","legoback_sd.wav"))
 pygame.display.set_icon(brick_img)
-coin = 100
-choice = "brick"
+coins = 100
+timer = 3660
+choice = "bomb"
 mhb = False
+
+def win():
+    screen.blit(back_img,(0,0))
+    draw_text(screen,"You win!",200,W/2,300,"green")
+    pygame.display.flip()
+    win_sd.play()
+    time.sleep(3)
+    pygame.quit()
+    exit() 
+
+def lose():
+    screen.blit(back_img,(0,0))
+    draw_text(screen,"You lose!",200,W/2,300,"red")
+    pygame.display.flip()
+    lose_sd.play()
+    time.sleep(3)
+    pygame.quit()
+    exit()
 
 font_name = os.path.join("lego fortress","font.ttf")
 def draw_text(surf, text, size, x, y,col):
@@ -65,7 +93,10 @@ class Cheese(pygame.sprite.Sprite):
         self.rect.centerx = W/2
         self.rect.centery = H/2
     def update(self):
-        pass
+        if self.rect.collidepoint(mouse.rect.center):
+            bite_sd.play()
+            time.sleep(1)
+            lose()
 
 class Brick(pygame.sprite.Sprite):
     def __init__(self):
@@ -79,8 +110,8 @@ class Brick(pygame.sprite.Sprite):
     def update(self):
         if self.rect.colliderect(mouse.rect) and not self.rect.colliderect(player.rect):
             mouse.move = False
-            if self.image.get_width() > 20:
-                self.image = pygame.transform.scale(self.image,(self.image.get_width()-0.01,self.image.get_height()-0.01))
+            if self.image.get_width() > 1:
+                self.image = pygame.transform.scale(self.image,(self.image.get_width()-0.00000001,self.image.get_height()-0.00000001))
             else:
                 mouse.move = True
                 allsp.remove(self)
@@ -108,9 +139,9 @@ class Mouse(pygame.sprite.Sprite):
             elif self.rect.centery > cheese.rect.centery:
                 self.rect.centery -= self.speed
             if self.rect.centerx < cheese.rect.centerx:
-                self.rect.centerx += self.speed
-            elif self.rect.centerx > cheese.rect.centery:
-                self.rect.centerx -= self.speed
+                self.rect.centerx += self.speed*2
+            elif self.rect.centerx > cheese.rect.centerx:
+                self.rect.centerx -= self.speed*2
 
 class Bomb(pygame.sprite.Sprite):
     def __init__(self):
@@ -131,6 +162,39 @@ class Bomb(pygame.sprite.Sprite):
             mouse.__init__()
             allsp.remove(self)
 
+class Coin(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = random.choice([coin_img,coin_img,coin_img,coin_img,coin_img,coin_img,coin_img,coin_img,coin_img,treasure_img])
+        self.pic = self.image
+        self.image = pygame.transform.scale(self.image,(50,50))
+        self.rect = self.image.get_rect()
+        self.rect.centerx = random.randint(50,950)
+        self.rect.centery = random.randint(50,550)
+    def update(self):
+        global coins
+        if self.rect.collidepoint(player.rect.center):
+            coin_sd.play()
+            if self.pic == coin_img:
+                coins += 1
+            else:
+                coins += 2
+            self.__init__()
+
+pygame.mixer.music.play(-1)
+
+start_img = pygame.transform.scale(starting_img, (1000,600))
+screen.blit(start_img, (0,0))
+pygame.display.update()
+waiting = True
+while waiting:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            waiting = False
+            pygame.quit()
+        if event.type == pygame.KEYDOWN:
+            waiting = False
+
 allsp = pygame.sprite.Group()
 player = Player()
 cheese = Cheese()
@@ -138,43 +202,57 @@ mouse = Mouse()
 allsp.add(player)
 allsp.add(cheese)
 allsp.add(mouse)
+for i in range(2):
+    coin = Coin()
+    allsp.add(coin)
 
 run = True
 while run:
+
+    if timer <= 0:
+        time.sleep(1)
+        win()
+
+    timer -= 1
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
         if event.type == pygame.MOUSEBUTTONDOWN:
             allsp.remove(player)
-            if choice == "brick" and coin >= 1:
-                coin -= 1
+            if choice == "brick" and coins >= 1:
+                coins -= 1
                 brick = Brick()
                 allsp.add(brick)
-            if choice == "bomb" and coin >= 20:
-                coin -= 20
+                put_sd.play()
+            if choice == "bomb" and coins >= 10:
+                coins -= 10
                 bomb = Bomb()
                 allsp.add(bomb)
+                put_sd.play()
             player = Player()
             allsp.add(player)
 
     key = pygame.key.get_pressed()
     if key[pygame.K_SPACE] == 1:
-        if choice == "brick" and coin >= 20:
+        if choice == "brick" and coins >= 10:
             choice = "bomb"
-        elif coin >= 1:
+        elif coins >= 1:
             choice = "brick"   
-        time.sleep(0.1)
+        time.sleep(0.2)
         pygame.display.update()
 
-    if coin < 20 and coin >= 1:
+    if coins < 10 and coins >= 1:
         choice = "brick"
-    elif coin < 1:
+    elif coins < 1:
         choice = "none"
 
     allsp.update()
     screen.blit(back_img,(0,0))
     allsp.draw(screen)
-    draw_text(screen, "Money: "+str(coin), 30,100, 20,"black")
+    draw_text(screen, "Money: "+str(coins), 30,100, 20,"black")
+    draw_text(screen, "brick: coin*1", 30,120, 580,"red")
+    draw_text(screen, "bomb: coin*10", 30,350, 580,"brown")
+    draw_text(screen, "Timer: "+str(int(timer/60)), 30,900, 20,"black")
     pygame.display.flip()
     clock.tick(60)
 

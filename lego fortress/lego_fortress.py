@@ -108,7 +108,7 @@ class Brick(pygame.sprite.Sprite):
         self.rect.centery = player.rect.centery+10
         self.save = []
     def update(self):
-        if self.rect.colliderect(mouse.rect) and not self.rect.colliderect(player.rect):
+        if self.rect.colliderect(mouse.rect):
             mouse.move = False
             if self.image.get_width() > 1:
                 self.image = pygame.transform.scale(self.image,(self.image.get_width()-0.00000001,self.image.get_height()-0.00000001))
@@ -152,7 +152,7 @@ class Bomb(pygame.sprite.Sprite):
         self.rect.centerx = player.rect.centerx
         self.rect.centery = player.rect.centery+10
     def update(self):
-        if self.rect.colliderect(mouse.rect) and not self.rect.colliderect(player.rect):
+        if self.rect.colliderect(mouse.rect):
             mouse.move = False
             boom_sd.play()
             self.image = boom_img

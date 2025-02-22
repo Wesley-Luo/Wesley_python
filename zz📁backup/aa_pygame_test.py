@@ -3,6 +3,7 @@ import random
 import time
 import os
 pygame.init()
+clock = pygame.time.Clock()
 W = 1000
 H = 600
 screen = pygame.display.set_mode((W,H))
@@ -15,4 +16,6 @@ while run:
             run = False
     screen.fill("black")
     pygame.display.flip()
+    clock.tick(60)
 pygame.quit()
+exit()

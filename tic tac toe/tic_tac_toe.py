@@ -98,20 +98,16 @@ while running:
         if c[0][y] == c[1][y] and c[1][y] == c[2][y] and c[1][y] != 0:
             if c[1][y] == "o" or c[1][y] == "x":
                 win = c[1][y]
-                pygame.draw.line(screen,"black",(block_x[0],block_y[(y)]),(block_x[2],block_y[(y)]),20)
     for x in range(3):
         if c[x][0] == c[x][1] and c[x][1] == c[x][2] and c[x][1] != 0:
             if c[x][1] == "o" or c[x][1] == "x":
                 win = c[x][1]
-                pygame.draw.line(screen,"black",(block_x[0],block_y[(y)]),(block_x[2],block_y[(y)]),20)
     if c[0][0] == c[1][1] and c[1][1] == c[2][2]:
         if c[1][1] == "o" or c[1][1] == "x":
             win = c[1][1]
     if (c[2][0] == c[1][1] and c[1][1] == c[0][2]):
         if c[1][1] == "o" or c[1][1] == "x":
             win = c[1][1]
-            pygame.draw.line(screen,"black",(block_x[0],block_y[(y)]),(block_x[2],block_y[(y)]),20)
-    pygame.display.flip()
 
     if win == "o":
             time.sleep(1)
@@ -165,3 +161,4 @@ while running:
 
     pygame.display.update()        
 pygame.quit()
+exit()

@@ -578,6 +578,8 @@ class Box(pygame.sprite.Sprite):
                 self.random = random.choice(select)
             else:
                 allsp.remove(self)
+        if self.rect.colliderect(player.rect) and select == []:
+            draw_text("Your backpack is too full.", 30, W/2, 30, "red", 255)
         self.collide = 0
         if refreshdown == False and select != [] and self.random != "":
             box_sd.play()
@@ -988,7 +990,7 @@ class Drink(pygame.sprite.Sprite):
             pygame.display.flip()
             pygame.time.delay(1000)
             player.super = 2
-            player.time3 = 1500
+            player.time3 = 1000
             havedrink = 0
             select.append("drink")
             have.remove("drink")

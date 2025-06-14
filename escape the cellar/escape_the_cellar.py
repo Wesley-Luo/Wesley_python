@@ -492,10 +492,10 @@ class Bomb(pygame.sprite.Sprite):
         if sety > 650 and reallevel < TOTAL:
             self.kill()
     def update(self):
-        global player,run
+        global player,run,reallevel
         for i in pygame.sprite.spritecollide(self,stonegp,False):
             self.collide = 1
-        if self.collide == 0:
+        if self.collide == 0 and self.rect.y > 0 and reallevel != TOTAL:
             self.kill()
         self.collide = 0
         if self.rect.y > 0 and refreshdown == False and level < TOTAL:
@@ -1369,6 +1369,7 @@ while run:
         time.sleep(0.1)
         for i in [bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey]:
             allsp.remove(i)
+            i.kill()
         for i in [player,bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey]:
             allsp.add(i)
         if reallevel == TOTAL:

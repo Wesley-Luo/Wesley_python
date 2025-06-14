@@ -532,8 +532,8 @@ class Bomb(pygame.sprite.Sprite):
                         hammer.image = pygame.transform.rotozoom(hammer_img,-60,1)
                     else:
                         hammer.image = pygame.transform.rotozoom(hammer_img,60,1)
-                    for i in range(120):
-                        self.image.set_alpha(215-i*2)
+                    for i in range(60):
+                        self.image.set_alpha(215-i*4)
                         allsp.draw(screen)
                         pygame.display.flip()
                     self.image.set_alpha(255)
@@ -684,8 +684,8 @@ class Web(pygame.sprite.Sprite):
             self.image = darkweb_img
             if mouse_click[0]:
                 desw_sd.play()
-                for i in range(120):
-                    self.image.set_alpha(215-i*2)
+                for i in range(60):
+                    self.image.set_alpha(215-i*4)
                     allsp.draw(screen)
                     pygame.display.flip()
                 self.rect.x = -100

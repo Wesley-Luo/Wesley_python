@@ -9,7 +9,7 @@ clock = pygame.time.Clock()
 W = 1200
 H = 800
 TOTAL = 20
-setx = 50
+setx = 50   
 sety = 0
 screen = pygame.display.set_mode((W,H))
 pygame.display.set_caption("地窖逃生記")
@@ -23,7 +23,7 @@ wall1_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the ce
 wall2_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","wall2.png")),(50,50))
 wall3_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","wall3.png")),(50,50))
 stone_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","stone.png")),(50,50))
-bomb_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","tnt.png")),(50,51))
+bomb_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","tnt.png")),(50,52))
 boom_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","boom.png")),(70,70))
 box_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","box.png")),(40,40))
 web_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","web.png")),(50,50))
@@ -47,7 +47,7 @@ potion_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the c
 boxpotion_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","boxpotion.png")),(600,600))
 poison_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","poison.png")),(20,30))
 boxpoison_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","boxpoison.png")),(600,600))
-smoke_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","smoke.png")),(1000,600))
+smoke_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","smoke.png")),(1200,800))
 drink_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","drink.png")),(20,30))
 boxdrink_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","boxdrink.png")),(600,600))
 choose_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","choose.png")),(27,27))
@@ -146,7 +146,7 @@ instr = ""
 carry = ""
 refreshdown = False
 refreshtime = 0
-chra = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,4,4,4,4,4]
+chra = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,4,4,4,4,4]
 
 font_name = os.path.join("escape the cellar","pixel_font.ttf")
 def draw_text(text, size, x, y,col,alpha):
@@ -313,7 +313,7 @@ class Dust(pygame.sprite.Sprite):
             self.gg = 1
         if self.gg == 1:
             self.image.set_alpha(100)
-            allsp.remove(self)
+            self.kill()
 def dust():
     if refreshdown == False:
         dust = Dust()
@@ -333,7 +333,7 @@ class Bat(pygame.sprite.Sprite):
     def update(self):
         global allsp,player,bullet,haveshield,havedark
         if refreshdown == True:
-            allsp.remove(self)
+            self.kill()
 
         if self.fall == False:
             self.time += self.speed
@@ -361,7 +361,7 @@ class Bat(pygame.sprite.Sprite):
                 self.dir = "l"
             self.rect.y += random.randint(0-self.speed,self.speed)
             if self.rect.y <= 0 or self.rect.y >= 760:
-                allsp.remove(self)
+                self.kill()
             if self.rect.colliderect(player.rect) and shield.shield == False and self.speed != 0:
                 bite_sd.play()
                 self.image = blood_img.convert_alpha()
@@ -383,7 +383,7 @@ class Bat(pygame.sprite.Sprite):
                     pygame.display.flip()
                 havedark = 1
                 dark.time += 255
-                allsp.remove(self)
+                self.kill()
             if self.rect.colliderect(bullet.rect) or self.rect.colliderect(shield.rect) and shield.shield == True:
                 if self.rect.colliderect(bullet.rect):
                     cymbal_sd.play()
@@ -400,7 +400,7 @@ class Bat(pygame.sprite.Sprite):
                     self.speed = 0
         if self.fall == True:
             if self.rect.y >= 770:
-                allsp.remove(self)
+                self.kill()
             else:
                 self.image = pygame.transform.flip(bat_img,False,True)
                 self.rect.y += 5
@@ -416,7 +416,7 @@ class Wall(pygame.sprite.Sprite):
         if refreshdown == True:
             self.rect.y += 2
             if self.rect.y >= 800:
-                allsp.remove(self)
+                self.kill()
 
 class Brick(pygame.sprite.Sprite):
     def __init__(self):
@@ -429,7 +429,7 @@ class Brick(pygame.sprite.Sprite):
         if refreshdown == True:
             self.rect.y += 2
             if self.rect.y >= 800:
-                allsp.remove(self)
+                self.kill()
 
 class Stone(pygame.sprite.Sprite):
     def __init__(self):
@@ -442,7 +442,7 @@ class Stone(pygame.sprite.Sprite):
         global touch,have2,haveslimey,haveladder
         mpos = pygame.mouse.get_pos()
         if self.rect.y == 750 and (self.rect.x >= 550 and self.rect.x <= 750) and refreshdown == False and level < TOTAL:
-            allsp.remove(self)
+            self.kill()
 
         if pygame.sprite.collide_rect(self,player) and not (player.rect.colliderect(ladder.rect) and haveladder == 0):
             touch = 1
@@ -479,8 +479,7 @@ class Stone(pygame.sprite.Sprite):
         if refreshdown == True:
             self.rect.y += 2
             if self.rect.y >= 800:
-                stonegp.remove(self)
-                allsp.remove(self)
+                self.kill()
                 
 class Bomb(pygame.sprite.Sprite):
     def __init__(self):
@@ -491,19 +490,17 @@ class Bomb(pygame.sprite.Sprite):
         self.rect.y = sety
         self.collide = 0
         if sety > 650 and reallevel < TOTAL:
-            allsp.remove(self)
+            self.kill()
     def update(self):
         global player,run
+        for i in pygame.sprite.spritecollide(self,stonegp,False):
+            self.collide = 1
+        if self.collide == 0:
+            self.kill()
+        self.collide = 0
         if self.rect.y > 0 and refreshdown == False and level < TOTAL:
             if self.rect.y > 650:
-                allsp.remove(self)
-            for i in pygame.sprite.spritecollide(self,stonegp,False):
-                self.collide = 1
-            if self.collide == 0:
-                allsp.remove(self)
-                bomb = Bomb()
-                allsp.add(bomb)
-            self.collide = 0
+                self.kill()
         if refreshdown == False:
             if pygame.sprite.collide_rect(self,player) and abs(self.rect.centery - player.rect.centery) < 30 and abs(self.rect.centerx - player.rect.centerx) < 30 and self.rect.y < 750:
                 self.rect.y -= 10
@@ -526,7 +523,7 @@ class Bomb(pygame.sprite.Sprite):
                 pygame.display.flip()
                 time.sleep(2)
                 dead_img.set_alpha(0)
-                allsp.remove(self)                  
+                self.kill()
             if havehammer == 1 and carry == "hammer" and self.rect.colliderect(hammer.rect):
                 self.image = darkbomb_img
                 if mouse_click[0]:
@@ -540,18 +537,18 @@ class Bomb(pygame.sprite.Sprite):
                         allsp.draw(screen)
                         pygame.display.flip()
                     self.image.set_alpha(255)
-                    allsp.remove(self)
+                    self.kill()
             else:
                 self.image = bomb_img
                 self.image.set_alpha(255)
         if refreshdown == True:
             self.rect.y += 2
             if self.rect.y >= 800:
-                allsp.remove(self)
+                self.kill()
         if run == False:
             self.rect.x = -50
             self.rect.y = -50
-            allsp.remove(self)
+            self.kill()
 
 class Box(pygame.sprite.Sprite):
     def __init__(self):
@@ -663,7 +660,7 @@ class Box(pygame.sprite.Sprite):
             self.image.set_alpha(215-i*2)
             allsp.draw(screen)
             pygame.display.flip()
-        allsp.remove(self)
+        self.kill()
 
             
 class Web(pygame.sprite.Sprite):
@@ -1068,12 +1065,12 @@ class Slimey(pygame.sprite.Sprite):
                 self.rect.centery = -200
                 self.put = [0,0]
                 allsp.remove(self)
-            elif self.put == [0,0]:
-                self.rect.centerx = -200
-                self.rect.centery = -200
             else:
                 self.rect.centerx = self.put[0]
                 self.rect.centery = self.put[1]
+        else:
+            self.rect.centerx = -200
+            self.rect.centery = -200
 
 class Ladder(pygame.sprite.Sprite):
     def __init__(self):
@@ -1101,12 +1098,12 @@ class Ladder(pygame.sprite.Sprite):
                 self.rect.centery = -200
                 self.put = [0,0]
                 allsp.remove(self)
-            elif self.put == [0,0]:
-                self.rect.centerx = -100
-                self.rect.centery = -100
             else:
                 self.rect.centerx = self.put[0]
                 self.rect.centery = self.put[1]
+        else:
+            self.rect.centerx = -200
+            self.rect.centery = -200
 
 class Bigladder(pygame.sprite.Sprite):
     def __init__(self):
@@ -1394,7 +1391,8 @@ while run:
 
     if level <= TOTAL:
         draw_text("level:" + str(level) +"/20",30,1050,20,levelcol[math.ceil(levelcolindex)%len(levelcol)],255)
-    draw_text(instr,15,700,785,"white",100)
+    if refreshdown == False:
+        draw_text(instr,15,700,785,"white",100)
     screen.blit(choose.image,(choose.rect.x,choose.rect.y))
     pygame.display.flip()
     clock.tick(60)

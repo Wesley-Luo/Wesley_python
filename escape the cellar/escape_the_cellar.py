@@ -141,7 +141,6 @@ have1 = []
 have2 = []
 
 select = ["gun","shield","potion","poison","drink","scissors","hammer","slimey","ladder"]
-select = ["ladder"]
 ins = ["Click mouse to shoot bullets.","Press space to defense.","Press d to drink potion if you are bitten by a bat.","Press d to drink the sports drink, you can jump higher and run faster for 15 seconds.","Press mouse to throw the poisonous smoke.","Choose a spider web and press mouse to cut it.","Choose a TNT and press mouse to destroy it.","Choose a block and press mouse to put the slimy glue.","Choose a block and press mouse to put the ladder."]
 instr = ""
 carry = ""

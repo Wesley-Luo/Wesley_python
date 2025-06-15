@@ -1162,26 +1162,26 @@ class Pausebutton(pygame.sprite.Sprite):
         self.rect.centerx = 925
         self.rect.centery = 25
         self.pause = False
-        self.range = 0
     def update(self):
         global pause
-        self.range += 1
-        self.range = self.range%5
         if self.pause == False:
             if self.rect.collidepoint(pygame.mouse.get_pos()):
                 self.image = pause1_2_img
                 self.rect = self.image.get_rect()
-                if pygame.mouse.get_pressed()[0] and self.range == 1:
+                if pygame.mouse.get_pressed()[0]:
                     self.pause = True
+                    time.sleep(0.1)
             else:
                 self.image = pause1_img
                 self.rect = self.image.get_rect()
+                
         elif self.pause == True:
             if self.rect.collidepoint(pygame.mouse.get_pos()):
                 self.image = pause2_2_img
                 self.rect = self.image.get_rect()
-                if pygame.mouse.get_pressed()[0] and self.range == 1:
+                if pygame.mouse.get_pressed()[0]:
                     self.pause = False
+                    time.sleep(0.1)
             else:
                 self.image = pause2_img
                 self.rect = self.image.get_rect()
@@ -1421,7 +1421,7 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-    if random.randint(0,250) == 50:
+    if random.randint(0,250) == 50 and pause == False:
         bat = Bat()
         allsp.add(bat)
     
@@ -1448,7 +1448,7 @@ while run:
         else:
             player.rect.centerx = W/2+20
             player.rect.y = 755
-            
+
     if pause == False:
         levelcolindex += 0.1
     levelcol = ["red","orange","yellow","green","skyblue","purple","pink"]

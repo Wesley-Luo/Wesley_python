@@ -36,7 +36,6 @@ score = 0
 
 with open("google dinosaur/google dinosaur.json","r") as file:
     data = json.load(file)
-print(data)
 
 font_name = os.path.join("google dinosaur","pixel_font.ttf")
 def draw_text(surf, text, size, x, y,col):

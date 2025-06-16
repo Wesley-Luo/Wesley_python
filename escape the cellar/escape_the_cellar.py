@@ -1437,10 +1437,10 @@ while run:
         refreshtime = 0
         refreshdown = False
         time.sleep(0.1)
-        for i in [bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey]:
+        for i in [bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
             allsp.remove(i)
             i.kill()
-        for i in [player,bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey]:
+        for i in [player,bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
             allsp.add(i)
         if reallevel == TOTAL:
             player.rect.centerx = 70

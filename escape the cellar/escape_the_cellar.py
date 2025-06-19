@@ -438,6 +438,7 @@ class Brick(pygame.sprite.Sprite):
             if refreshdown == True:
                 self.rect.y += 2
                 if self.rect.y >= 800:
+                    
                     self.kill()
 
 class Stone(pygame.sprite.Sprite):
@@ -506,7 +507,7 @@ class Bomb(pygame.sprite.Sprite):
         if pause == False:
             for i in pygame.sprite.spritecollide(self,stonegp,False):
                 self.collide = 1
-            if self.collide == 0 and self.rect.y > 0 and reallevel != TOTAL:
+            if self.collide == 0 and reallevel != TOTAL:
                 self.kill()
             self.collide = 0
             if self.rect.y > 0 and refreshdown == False and level < TOTAL:
@@ -1378,7 +1379,6 @@ def refresh():
 
 bigladder = Bigladder()
 pausebutton = Pausebutton()
-allsp.add(pausebutton)
 player = Player()
 shield = Shield()
 allsp.add(player)
@@ -1395,6 +1395,7 @@ ladder = Ladder()
 allsp.add(ladder)
 dark = Dark()
 allsp.add(dark)
+allsp.add(pausebutton)
 bullet = Bullet()
 allsp.add(bullet)
 potion = Potion()

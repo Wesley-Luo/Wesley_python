@@ -1454,9 +1454,10 @@ while run:
         for i in [bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
             allsp.remove(i)
             i.kill()
-        # allsp.clear(screen,screen)
+
         for i in [player,bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
             allsp.add(i)
+            
         if reallevel == TOTAL:
             player.rect.centerx = 70
             player.rect.y = 705
@@ -1466,6 +1467,7 @@ while run:
 
     if pause == False:
         levelcolindex += 0.1
+
     levelcol = ["red","orange","yellow","green","skyblue","purple","pink"]
     allsp.update()
     screen.fill("black")

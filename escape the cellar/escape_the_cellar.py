@@ -735,7 +735,7 @@ class Gun(pygame.sprite.Sprite):
     def update(self):
         global havegun,mouse_pos,carry
         if pause == False:
-            if havegun == 1 and carry == "gun":
+            if havegun == 1 and carry == "gun" and refreshdown == False:
                 self.rect.centery = player.rect.centery
                 if mouse_pos[0] >= player.rect.centerx:
                     self.image = gun2_img
@@ -803,7 +803,7 @@ class Shield(pygame.sprite.Sprite):
     def update(self):
         global haveshield,carry
         if pause == False:
-            if haveshield == 1 and carry == "shield":
+            if haveshield == 1 and carry == "shield" and refreshdown == False:
                 self.rect.centerx = player.rect.centerx
                 if player.image == player_img or player.image == player_walk_img:
                     self.rect.centerx = player.rect.centerx + 10
@@ -860,7 +860,7 @@ class Potion(pygame.sprite.Sprite):
         global havepotion,havedark,select,carry
         if pause == False:
             key = pygame.key.get_pressed()
-            if havepotion == 1 and key[pygame.K_d] and havedark == 1 and carry == "potion":
+            if havepotion == 1 and key[pygame.K_d] and havedark == 1 and carry == "potion" and refreshdown == False:
                 draw_text("healing...", 30, W/2, 30, "red", 255)
                 pygame.display.flip()
                 pygame.time.delay(1000)
@@ -895,7 +895,7 @@ class Poison(pygame.sprite.Sprite):
     def update(self):
         global havepoison,select,mouse_click,mouse_pos,have,have2,carry
         if pause == False:
-            if havepoison == 1 and carry == "poison":
+            if havepoison == 1 and carry == "poison" and refreshdown == False:
                 if self.shoot == 0 and self.smoke == False:
                     self.rect.centerx = player.rect.centerx
                     self.rect.centery = player.rect.centery
@@ -1020,7 +1020,7 @@ class Drink(pygame.sprite.Sprite):
         global havedrink,select,carry
         if pause == False:
             key = pygame.key.get_pressed()
-            if havedrink == 1 and key[pygame.K_d] and carry == "drink":
+            if havedrink == 1 and key[pygame.K_d] and carry == "drink" and refreshdown == False:
                 draw_text("Supermode starts.", 30, W/2, 30, "red", 255)
                 pygame.display.flip()
                 pygame.time.delay(1000)
@@ -1052,7 +1052,7 @@ class Scissors(pygame.sprite.Sprite):
     def update(self):
         global havescissors,select,carry
         if pause == False:
-            if havescissors == 1 and carry == "scissors":
+            if havescissors == 1 and carry == "scissors" and refreshdown == False:
                 self.rect.centerx = player.rect.centerx
                 self.rect.centery = player.rect.centery
             else:
@@ -1069,7 +1069,7 @@ class Hammer(pygame.sprite.Sprite):
     def update(self):
         global havehammer,select,carry
         if pause == False:
-            if havehammer == 1 and carry == "hammer":
+            if havehammer == 1 and carry == "hammer" and refreshdown == False:
                 self.rect.centerx = player.rect.centerx
                 self.rect.centery = player.rect.centery-10
                 if not mouse_click[0]:
@@ -1089,7 +1089,7 @@ class Slimey(pygame.sprite.Sprite):
     def update(self):
         global haveslimey,select,carry
         if pause == False:
-            if haveslimey == 1 and carry == "slimey":
+            if haveslimey == 1 and carry == "slimey" and refreshdown == False:
                 self.rect.centerx = player.rect.centerx
                 self.rect.centery = player.rect.centery-10
 
@@ -1124,7 +1124,7 @@ class Ladder(pygame.sprite.Sprite):
     def update(self):
         global haveladder,select,carry
         if pause == False:
-            if haveladder == 1 and carry == "ladder":
+            if haveladder == 1 and carry == "ladder" and refreshdown == False:
                 self.rect.centerx = player.rect.centerx
                 self.rect.centery = player.rect.centery-10
 
@@ -1457,7 +1457,7 @@ while run:
 
         for i in [player,bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
             allsp.add(i)
-            
+
         if reallevel == TOTAL:
             player.rect.centerx = 70
             player.rect.y = 705

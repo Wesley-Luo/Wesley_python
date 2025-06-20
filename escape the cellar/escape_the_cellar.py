@@ -319,6 +319,7 @@ class Dust(pygame.sprite.Sprite):
             self.gg = 1
         if self.gg == 1:
             self.image.set_alpha(100)
+            allsp.remove(self)
             self.kill()
 def dust():
     if refreshdown == False:
@@ -340,6 +341,7 @@ class Bat(pygame.sprite.Sprite):
         global allsp,player,bullet,haveshield,havedark
         if pause == False:
             if refreshdown == True:
+                allsp.remove(self)
                 self.kill()
 
             if self.fall == False:
@@ -368,6 +370,7 @@ class Bat(pygame.sprite.Sprite):
                     self.dir = "l"
                 self.rect.y += random.randint(0-self.speed,self.speed)
                 if self.rect.y <= 0 or self.rect.y >= 760:
+                    allsp.remove(self)
                     self.kill()
                 if self.rect.colliderect(player.rect) and shield.shield == False and self.speed != 0:
                     bite_sd.play()
@@ -390,6 +393,7 @@ class Bat(pygame.sprite.Sprite):
                         pygame.display.flip()
                     havedark = 1
                     dark.time += 255
+                    allsp.remove(self)
                     self.kill()
                 if self.rect.colliderect(bullet.rect) or self.rect.colliderect(shield.rect) and shield.shield == True:
                     if self.rect.colliderect(bullet.rect):
@@ -407,6 +411,7 @@ class Bat(pygame.sprite.Sprite):
                         self.speed = 0
             if self.fall == True:
                 if self.rect.y >= 770:
+                    allsp.remove(self)
                     self.kill()
                 else:
                     self.image = pygame.transform.flip(bat_img,False,True)
@@ -423,7 +428,8 @@ class Wall(pygame.sprite.Sprite):
         if pause == False:
             if refreshdown == True:
                 self.rect.y += 2
-                if self.rect.y >= 800:
+                if self.rect.y >= 799:
+                    allsp.remove(self)
                     self.kill()
 
 class Brick(pygame.sprite.Sprite):
@@ -437,8 +443,8 @@ class Brick(pygame.sprite.Sprite):
         if pause == False:
             if refreshdown == True:
                 self.rect.y += 2
-                if self.rect.y >= 800:
-                    
+                if self.rect.y >= 799:
+                    allsp.remove(self)
                     self.kill()
 
 class Stone(pygame.sprite.Sprite):
@@ -453,6 +459,7 @@ class Stone(pygame.sprite.Sprite):
         if pause == False:
             mpos = pygame.mouse.get_pos()
             if self.rect.y == 750 and (self.rect.x >= 550 and self.rect.x <= 750) and refreshdown == False and level < TOTAL:
+                allsp.remove(self)
                 self.kill()
 
             if pygame.sprite.collide_rect(self,player) and not (player.rect.colliderect(ladder.rect) and haveladder == 0):
@@ -489,7 +496,8 @@ class Stone(pygame.sprite.Sprite):
                     self.image.set_alpha(255)
             if refreshdown == True:
                 self.rect.y += 2
-                if self.rect.y >= 800:
+                if self.rect.y >= 799:
+                    allsp.remove(self)
                     self.kill()
                 
 class Bomb(pygame.sprite.Sprite):
@@ -535,6 +543,7 @@ class Bomb(pygame.sprite.Sprite):
                     pygame.display.flip()
                     time.sleep(2)
                     dead_img.set_alpha(0)
+                    allsp.remove(self)
                     self.kill()
                 if havehammer == 1 and carry == "hammer" and self.rect.colliderect(hammer.rect):
                     self.image = darkbomb_img
@@ -556,10 +565,12 @@ class Bomb(pygame.sprite.Sprite):
             if refreshdown == True:
                 self.rect.y += 2
                 if self.rect.y >= 800:
+                    allsp.remove(self)
                     self.kill()
             if run == False:
                 self.rect.x = -50
                 self.rect.y = -50
+                allsp.remove(self)
                 self.kill()
 
 class Box(pygame.sprite.Sprite):
@@ -1094,6 +1105,7 @@ class Slimey(pygame.sprite.Sprite):
                     self.rect.centery = -200
                     self.put = [0,0]
                     allsp.remove(self)
+                    self.kill()
                 else:
                     self.rect.centerx = self.put[0]
                     self.rect.centery = self.put[1]
@@ -1128,6 +1140,7 @@ class Ladder(pygame.sprite.Sprite):
                     self.rect.centery = -200
                     self.put = [0,0]
                     allsp.remove(self)
+                    self.kill()
                 else:
                     self.rect.centerx = self.put[0]
                     self.rect.centery = self.put[1]
@@ -1441,6 +1454,7 @@ while run:
         for i in [bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
             allsp.remove(i)
             i.kill()
+        # allsp.clear(screen,screen)
         for i in [player,bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
             allsp.add(i)
         if reallevel == TOTAL:

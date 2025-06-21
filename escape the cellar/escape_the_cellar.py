@@ -809,7 +809,7 @@ class Dark(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = -10000
         self.rect.y = -10000
-        self.time = 255
+        self.time = 0
         self.speed = 0.5
     def update(self):
         global havedark
@@ -829,6 +829,10 @@ class Dark(pygame.sprite.Sprite):
                 self.speed = self.time/510
             if refreshdown == True:
                 self.time = 0
+                havedark = 0
+                self.rect.x = -10000
+                self.rect.y = -10000
+                allsp.remove(self)
 
 class Potion(pygame.sprite.Sprite):
     def __init__(self):

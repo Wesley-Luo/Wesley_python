@@ -267,7 +267,8 @@ class Player(pygame.sprite.Sprite):
     def walk(self):
         ky = pygame.key.get_pressed()
         if ky[pygame.K_LEFT] or ky[pygame.K_RIGHT]:
-            dust()
+            if self.rect.y <= 760:
+                dust()
             self.time += 1
             if self.time >= 10:
                 self.time = 0
@@ -297,7 +298,7 @@ class Dust(pygame.sprite.Sprite):
         super().__init__()
         self.imagelist = [dust1_img,dust2_img,dust3_img,dust4_img]
         self.choose = (round(player.time2/2))%3
-        self.image = self.imagelist[self.choose]
+        self.image = self.imagelist[self.choose].convert_alpha()
         self.rect = self.image.get_rect()
         if player.image == player_img or player.image == player_walk_img:
             self.rect.x = player.rect.centerx-30
@@ -305,13 +306,20 @@ class Dust(pygame.sprite.Sprite):
             self.rect.x = player.rect.centerx+30
         self.rect.y = player.rect.centery+random.randint(-10,10)
         self.time = 0
+        self.gg = 1
+        self.image.set_alpha(100)
     def update(self):
+        self.gg = 1
+        for i in pygame.sprite.spritecollide(self,stonegp,False):
+            self.gg = 0
         self.time += 1
         if self.time <= 50:
-            self.image = pygame.transform.rotozoom(self.image,0,0.999)
+            self.image.set_alpha(200-self.time*4)
         else:
-            allsp.remove(self)
-
+            self.gg = 1
+        if self.gg == 1:
+            self.image.set_alpha(100)
+            self.kill()
 def dust():
     if refreshdown == False:
         dust = Dust()
@@ -332,7 +340,7 @@ class Bat(pygame.sprite.Sprite):
         global allsp,player,bullet,haveshield,havedark
         if pause == False:
             if refreshdown == True:
-                allsp.remove(self)
+                self.kill()
 
             if self.fall == False:
                 self.time += self.speed
@@ -360,29 +368,29 @@ class Bat(pygame.sprite.Sprite):
                     self.dir = "l"
                 self.rect.y += random.randint(0-self.speed,self.speed)
                 if self.rect.y <= 0 or self.rect.y >= 760:
-                    allsp.remove(self)
+                    self.kill()
                 if self.rect.colliderect(player.rect) and shield.shield == False and self.speed != 0:
                     bite_sd.play()
                     self.image = blood_img.convert_alpha()
                     self.rect = self.image.get_rect()
                     self.rect.centerx = player.rect.centerx
                     self.rect.centery = player.rect.centery
-                    for i in range(50):
-                        self.image = pygame.transform.rotozoom(blood_img,0,1+i/35)
+                    for i in range(100):
+                        self.image = pygame.transform.rotozoom(blood_img,0,1+i/70)
                         self.rect = self.image.get_rect()
                         self.rect.centerx = player.rect.centerx
                         self.rect.centery = player.rect.centery
                         allsp.draw(screen)
                         pygame.time.delay(1)
                         pygame.display.flip()
-                    for j in range(64):
-                        self.image.set_alpha(255-j*4)
+                    for j in range(127):
+                        self.image.set_alpha(255-j*2)
                         allsp.draw(screen)
                         pygame.time.delay(1)
                         pygame.display.flip()
                     havedark = 1
                     dark.time += 255
-                    allsp.remove(self)
+                    self.kill()
                 if self.rect.colliderect(bullet.rect) or self.rect.colliderect(shield.rect) and shield.shield == True:
                     if self.rect.colliderect(bullet.rect):
                         cymbal_sd.play()
@@ -399,7 +407,7 @@ class Bat(pygame.sprite.Sprite):
                         self.speed = 0
             if self.fall == True:
                 if self.rect.y >= 770:
-                    allsp.remove(self)
+                    self.kill()
                 else:
                     self.image = pygame.transform.flip(bat_img,False,True)
                     self.rect.y += 5
@@ -412,10 +420,11 @@ class Wall(pygame.sprite.Sprite):
         self.rect.x = setx
         self.rect.y = sety
     def update(self):
-        if refreshdown == True:
-            self.rect.y += 2
-        if self.rect.y > 799:
-            allsp.remove(self)
+        if pause == False:
+            if refreshdown == True:
+                self.rect.y += 2
+                if self.rect.y >= 800:
+                    self.kill()
 
 class Brick(pygame.sprite.Sprite):
     def __init__(self):
@@ -425,10 +434,11 @@ class Brick(pygame.sprite.Sprite):
         self.rect.x = setx
         self.rect.y = sety
     def update(self):
-        if refreshdown == True:
-            self.rect.y += 2
-        if self.rect.y > 799:
-            allsp.remove(self)
+        if pause == False:
+            if refreshdown == True:
+                self.rect.y += 2
+                if self.rect.y >= 800:
+                    self.kill()
 
 class Stone(pygame.sprite.Sprite):
     def __init__(self):
@@ -441,9 +451,8 @@ class Stone(pygame.sprite.Sprite):
         global touch,have2,haveslimey,haveladder
         if pause == False:
             mpos = pygame.mouse.get_pos()
-            if (self.rect.y == -50 or self.rect.y == 750) and (self.rect.x >= 550 and self.rect.x <= 750) and refreshdown == False and level < TOTAL:
-                allsp.remove(self)
-                stonegp.remove(self)
+            if self.rect.y == 750 and (self.rect.x >= 550 and self.rect.x <= 750) and refreshdown == False and level < TOTAL:
+                self.kill()
 
             if pygame.sprite.collide_rect(self,player) and not (player.rect.colliderect(ladder.rect) and haveladder == 0):
                 touch = 1
@@ -451,6 +460,7 @@ class Stone(pygame.sprite.Sprite):
                 if self.rect.y < player.rect.centery-40:
                     player.rect.y += 30 
                     player.jump = 0
+                    dust()
                 if abs(self.rect.centery - player.rect.centery) <= 20:
                     if self.rect.centerx < player.rect.centerx:
                         player.rect.x += 10
@@ -478,9 +488,8 @@ class Stone(pygame.sprite.Sprite):
                     self.image.set_alpha(255)
             if refreshdown == True:
                 self.rect.y += 2
-            if self.rect.y > 799:
-                stonegp.remove(self)
-                allsp.remove(self)
+                if self.rect.y >= 800:
+                    self.kill()
                 
 class Bomb(pygame.sprite.Sprite):
     def __init__(self):
@@ -491,18 +500,18 @@ class Bomb(pygame.sprite.Sprite):
         self.rect.y = sety
         self.collide = 0
         if sety > 650 and reallevel < TOTAL:
-            allsp.remove(self)
+            self.kill()
     def update(self):
         global player,run,reallevel
         if pause == False:
             for i in pygame.sprite.spritecollide(self,stonegp,False):
                 self.collide = 1
-            if self.collide == 0 and reallevel != TOTAL:
-                allsp.remove(self)
+            if self.collide == 0 and self.rect.y > 0 and reallevel != TOTAL:
+                self.kill()
             self.collide = 0
             if self.rect.y > 0 and refreshdown == False and level < TOTAL:
                 if self.rect.y > 650:
-                    allsp.remove(self)
+                    self.kill()
             if refreshdown == False:
                 if pygame.sprite.collide_rect(self,player) and abs(self.rect.centery - player.rect.centery) < 30 and abs(self.rect.centerx - player.rect.centerx) < 30 and self.rect.y < 750:
                     self.rect.y -= 10
@@ -525,7 +534,7 @@ class Bomb(pygame.sprite.Sprite):
                     pygame.display.flip()
                     time.sleep(2)
                     dead_img.set_alpha(0)
-                    allsp.remove(self)
+                    self.kill()
                 if havehammer == 1 and carry == "hammer" and self.rect.colliderect(hammer.rect):
                     self.image = darkbomb_img
                     if mouse_click[0]:
@@ -539,18 +548,18 @@ class Bomb(pygame.sprite.Sprite):
                             allsp.draw(screen)
                             pygame.display.flip()
                         self.image.set_alpha(255)
-                        allsp.remove(self)
+                        self.kill()
                 else:
                     self.image = bomb_img
                     self.image.set_alpha(255)
             if refreshdown == True:
                 self.rect.y += 2
-            if self.rect.y >= 800:
-                allsp.remove(self)
+                if self.rect.y >= 800:
+                    self.kill()
             if run == False:
                 self.rect.x = -50
                 self.rect.y = -50
-                allsp.remove(self)
+                self.kill()
 
 class Box(pygame.sprite.Sprite):
     def __init__(self):
@@ -566,12 +575,16 @@ class Box(pygame.sprite.Sprite):
         if pause == False:
             if refreshdown == True:
                 self.rect.y += 2
-            if self.rect.y > 799:
-                allsp.remove(self)
+                if self.rect.y >= 800:
+                    allsp.remove(self)
+                if self.rect.y >= 500 and (self.rect.x >= 550 and self.rect.x <= 750):
+                    allsp.remove(self)
             for i in pygame.sprite.spritecollide(self,stonegp,False):
                 self.collide = 1
             if self.collide == 0:
                 allsp.remove(self)
+                box = Box()
+                allsp.add(box)
             if self.rect.colliderect(player.rect) and select != []:
                 if self.collide == 1:
                     self.random = random.choice(select)
@@ -579,8 +592,6 @@ class Box(pygame.sprite.Sprite):
                     allsp.remove(self)
             if self.rect.colliderect(player.rect) and select == []:
                 draw_text("Your backpack is too full.", 30, W/2, 30, "red", 255)
-                pygame.display.update()
-                pygame.time.delay(1)
             self.collide = 0
             if refreshdown == False and select != [] and self.random != "":
                 box_sd.play()
@@ -659,12 +670,13 @@ class Box(pygame.sprite.Sprite):
     def remove(self):
         pygame.display.update()
         time.sleep(1.5)
-        for i in range(60):
-            self.image.set_alpha(215-i*4)
+        for i in range(120):
+            self.image.set_alpha(215-i*2)
             allsp.draw(screen)
             pygame.display.flip()
-        allsp.remove(self)
+        self.kill()
 
+            
 class Web(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -679,6 +691,7 @@ class Web(pygame.sprite.Sprite):
             if abs(self.rect.y - 750) < 10 and (self.rect.x >= 550 and self.rect.x <= 750):
                 self.rect.x = -50
                 self.rect.y = -50
+                allsp.remove(self)
             if havescissors == 1 and carry == "scissors" and self.rect.colliderect(player.rect):
                 darkweb_img.set_alpha(255)
                 self.image = darkweb_img
@@ -690,12 +703,14 @@ class Web(pygame.sprite.Sprite):
                         pygame.display.flip()
                     self.rect.x = -100
                     self.rect.y = -100
+                    allsp.remove(self)
             else:
                 self.image = web_img
                 self.image.set_alpha(255)
             if refreshdown == True:
                 self.rect.y += 2
                 if self.rect.y >= 800:
+                    webgp.remove(self)
                     allsp.remove(self)
             
 class Gun(pygame.sprite.Sprite):
@@ -708,7 +723,7 @@ class Gun(pygame.sprite.Sprite):
     def update(self):
         global havegun,mouse_pos,carry
         if pause == False:
-            if havegun == 1 and carry == "gun" and refreshdown == False:
+            if havegun == 1 and carry == "gun":
                 self.rect.centery = player.rect.centery
                 if mouse_pos[0] >= player.rect.centerx:
                     self.image = gun2_img
@@ -719,8 +734,6 @@ class Gun(pygame.sprite.Sprite):
             else:
                 self.rect.x = -50
                 self.rect.y = -50
-        if refreshdown == True:
-            allsp.remove(self)
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self):
@@ -740,17 +753,15 @@ class Bullet(pygame.sprite.Sprite):
                 self.rect.x = gun.rect.centerx
                 self.rect.y = gun.rect.centery-10
                 self.shoot = 1
-                self.spx = (aim.rect.centerx - self.rect.centerx)/10
-                self.spy = (aim.rect.centery - self.rect.centery)/10
+                self.spx = (aim.rect.centerx - self.rect.centerx)/15
+                self.spy = (aim.rect.centery - self.rect.centery)/15
             if self.shoot == 1:
                 self.rect.centerx += self.spx
                 self.rect.centery += self.spy
                 if self.rect.colliderect(aim.rect) or self.rect.x <= 0 or self.rect.x >= 1200 or self.rect.y <= 0 or self.rect.y >= 800:
                     self.shoot = 0
                     self.rect.x = -50
-                    self.rect.y = -50
-        if refreshdown == True:
-            allsp.remove(self)
+                    self.rect.y = -50 
 
 class Aim(pygame.sprite.Sprite):
     def __init__(self):
@@ -768,8 +779,6 @@ class Aim(pygame.sprite.Sprite):
             else:
                 self.rect.x = -200
                 self.rect.y = -200
-        if refreshdown == True:
-            allsp.remove(self)
 
 class Shield(pygame.sprite.Sprite):
     def __init__(self):
@@ -782,7 +791,7 @@ class Shield(pygame.sprite.Sprite):
     def update(self):
         global haveshield,carry
         if pause == False:
-            if haveshield == 1 and carry == "shield" and refreshdown == False:
+            if haveshield == 1 and carry == "shield":
                 self.rect.centerx = player.rect.centerx
                 if player.image == player_img or player.image == player_walk_img:
                     self.rect.centerx = player.rect.centerx + 10
@@ -799,8 +808,6 @@ class Shield(pygame.sprite.Sprite):
             else:
                 self.rect.x = -100
                 self.rect.y = -100
-        if refreshdown == True:
-            allsp.remove(self)
 
 class Dark(pygame.sprite.Sprite):
     def __init__(self):
@@ -809,7 +816,7 @@ class Dark(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = -10000
         self.rect.y = -10000
-        self.time = 0
+        self.time = 255
         self.speed = 0.5
     def update(self):
         global havedark
@@ -829,10 +836,6 @@ class Dark(pygame.sprite.Sprite):
                 self.speed = self.time/510
             if refreshdown == True:
                 self.time = 0
-                havedark = 0
-                self.rect.x = -10000
-                self.rect.y = -10000
-                allsp.remove(self)
 
 class Potion(pygame.sprite.Sprite):
     def __init__(self):
@@ -845,7 +848,7 @@ class Potion(pygame.sprite.Sprite):
         global havepotion,havedark,select,carry
         if pause == False:
             key = pygame.key.get_pressed()
-            if havepotion == 1 and key[pygame.K_d] and havedark == 1 and carry == "potion" and refreshdown == False:
+            if havepotion == 1 and key[pygame.K_d] and havedark == 1 and carry == "potion":
                 draw_text("healing...", 30, W/2, 30, "red", 255)
                 pygame.display.flip()
                 pygame.time.delay(1000)
@@ -864,8 +867,6 @@ class Potion(pygame.sprite.Sprite):
             else:
                 self.rect.centerx = -100
                 self.rect.centery = -100
-        if refreshdown == True:
-            allsp.remove(self)
 
 class Poison(pygame.sprite.Sprite):
     def __init__(self):
@@ -882,7 +883,7 @@ class Poison(pygame.sprite.Sprite):
     def update(self):
         global havepoison,select,mouse_click,mouse_pos,have,have2,carry
         if pause == False:
-            if havepoison == 1 and carry == "poison" and refreshdown == False:
+            if havepoison == 1 and carry == "poison":
                 if self.shoot == 0 and self.smoke == False:
                     self.rect.centerx = player.rect.centerx
                     self.rect.centery = player.rect.centery
@@ -890,8 +891,8 @@ class Poison(pygame.sprite.Sprite):
                     self.rect.centerx = player.rect.centerx
                     self.rect.centery = player.rect.centery
                     self.shoot = 1
-                    self.spx = (aim2.rect.centerx - self.rect.centerx)/20
-                    self.spy = (aim2.rect.centery - self.rect.centery)/20
+                    self.spx = (aim2.rect.centerx - self.rect.centerx)/25
+                    self.spy = (aim2.rect.centery - self.rect.centery)/25
                 if self.shoot == 1:
                     self.rect.centerx += self.spx
                     self.rect.centery += self.spy 
@@ -920,8 +921,6 @@ class Poison(pygame.sprite.Sprite):
                 have.remove("poison")
                 have2.remove("poison")
                 self.__init__()
-        if refreshdown == True:
-            allsp.remove(self)
 
 class Aim2(pygame.sprite.Sprite):
     def __init__(self):
@@ -942,8 +941,6 @@ class Aim2(pygame.sprite.Sprite):
             if poison.smoke == True:
                 self.rect.x = -200
                 self.rect.y = -200
-        if refreshdown == True:
-            allsp.remove(self)
 
 class Choose(pygame.sprite.Sprite):
     def __init__(self):
@@ -1011,7 +1008,7 @@ class Drink(pygame.sprite.Sprite):
         global havedrink,select,carry
         if pause == False:
             key = pygame.key.get_pressed()
-            if havedrink == 1 and key[pygame.K_d] and carry == "drink" and refreshdown == False:
+            if havedrink == 1 and key[pygame.K_d] and carry == "drink":
                 draw_text("Supermode starts.", 30, W/2, 30, "red", 255)
                 pygame.display.flip()
                 pygame.time.delay(1000)
@@ -1032,8 +1029,6 @@ class Drink(pygame.sprite.Sprite):
             else:
                 self.rect.centerx = -100
                 self.rect.centery = -100
-        if refreshdown == True:
-            allsp.remove(self)
             
 class Scissors(pygame.sprite.Sprite):
     def __init__(self):
@@ -1045,14 +1040,12 @@ class Scissors(pygame.sprite.Sprite):
     def update(self):
         global havescissors,select,carry
         if pause == False:
-            if havescissors == 1 and carry == "scissors" and refreshdown == False:
+            if havescissors == 1 and carry == "scissors":
                 self.rect.centerx = player.rect.centerx
                 self.rect.centery = player.rect.centery
             else:
                 self.rect.centerx = -100
                 self.rect.centery = -100
-        if refreshdown == True:
-            allsp.remove(self)
 
 class Hammer(pygame.sprite.Sprite):
     def __init__(self):
@@ -1064,7 +1057,7 @@ class Hammer(pygame.sprite.Sprite):
     def update(self):
         global havehammer,select,carry
         if pause == False:
-            if havehammer == 1 and carry == "hammer" and refreshdown == False:
+            if havehammer == 1 and carry == "hammer":
                 self.rect.centerx = player.rect.centerx
                 self.rect.centery = player.rect.centery-10
                 if not mouse_click[0]:
@@ -1072,8 +1065,6 @@ class Hammer(pygame.sprite.Sprite):
             else:
                 self.rect.centerx = -100
                 self.rect.centery = -100
-        if refreshdown == True:
-            allsp.remove(self)
 
 class Slimey(pygame.sprite.Sprite):
     def __init__(self):
@@ -1086,7 +1077,7 @@ class Slimey(pygame.sprite.Sprite):
     def update(self):
         global haveslimey,select,carry
         if pause == False:
-            if haveslimey == 1 and carry == "slimey" and refreshdown == False:
+            if haveslimey == 1 and carry == "slimey":
                 self.rect.centerx = player.rect.centerx
                 self.rect.centery = player.rect.centery-10
 
@@ -1108,8 +1099,6 @@ class Slimey(pygame.sprite.Sprite):
             else:
                 self.rect.centerx = -200
                 self.rect.centery = -200
-        if refreshdown == True:
-            allsp.remove(self)
 
 class Ladder(pygame.sprite.Sprite):
     def __init__(self):
@@ -1122,7 +1111,7 @@ class Ladder(pygame.sprite.Sprite):
     def update(self):
         global haveladder,select,carry
         if pause == False:
-            if haveladder == 1 and carry == "ladder" and refreshdown == False:
+            if haveladder == 1 and carry == "ladder":
                 self.rect.centerx = player.rect.centerx
                 self.rect.centery = player.rect.centery-10
 
@@ -1144,8 +1133,6 @@ class Ladder(pygame.sprite.Sprite):
             else:
                 self.rect.centerx = -200
                 self.rect.centery = -200
-        if refreshdown == True:
-            allsp.remove(self)
 
 class Bigladder(pygame.sprite.Sprite):
     def __init__(self):
@@ -1391,6 +1378,7 @@ def refresh():
 
 bigladder = Bigladder()
 pausebutton = Pausebutton()
+allsp.add(pausebutton)
 player = Player()
 shield = Shield()
 allsp.add(player)
@@ -1407,7 +1395,6 @@ ladder = Ladder()
 allsp.add(ladder)
 dark = Dark()
 allsp.add(dark)
-allsp.add(pausebutton)
 bullet = Bullet()
 allsp.add(bullet)
 potion = Potion()
@@ -1421,8 +1408,6 @@ allsp.add(aim)
 aim2 = Aim2()
 allsp.add(aim2)
 choose = Choose()
-bat = Bat()
-delete = [player,bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]
 
 run = True
 bat = Bat()
@@ -1452,10 +1437,11 @@ while run:
         refreshtime = 0
         refreshdown = False
         time.sleep(0.1)
-
-        for i in delete:
+        for i in [bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
+            allsp.remove(i)
+            i.kill()
+        for i in [player,bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
             allsp.add(i)
-
         if reallevel == TOTAL:
             player.rect.centerx = 70
             player.rect.y = 705
@@ -1465,7 +1451,6 @@ while run:
 
     if pause == False:
         levelcolindex += 0.1
-
     levelcol = ["red","orange","yellow","green","skyblue","purple","pink"]
     allsp.update()
     screen.fill("black")

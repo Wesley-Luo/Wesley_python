@@ -55,8 +55,8 @@ boxdrink_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the
 choose_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","choose.png")),(27,27))
 dead_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","dead.png")),(600,550))
 dead_img.set_alpha(0)
-heal_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","heal.png")),(60,60))
-speed_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","speed.png")),(60,60))
+heal_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","heal.png")),(80,80))
+speed_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","speed.png")),(80,80))
 scissors_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","scissor.png")),(20,30))
 boxscissors_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","boxscissors.png")),(600,600))
 darkweb_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","darkweb.png")),(50,50))
@@ -178,7 +178,7 @@ def win():
     pygame.quit()
     exit()
 
-def blit_scaled(img, x, y, w, h, wait_time=0.3):
+def blit_scaled(img, x, y, w, h):
     W, H = realscreen.get_size()
     scale_x = W / VIRTUAL_W
     scale_y = H / VIRTUAL_H
@@ -187,7 +187,6 @@ def blit_scaled(img, x, y, w, h, wait_time=0.3):
     realscreen.blit(scaled_screen, (0, 0))
     realscreen.blit(scaled_img, (int(x*scale_x), int(y*scale_y)))
     pygame.display.flip()
-    time.sleep(wait_time)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -201,21 +200,9 @@ class Player(pygame.sprite.Sprite):
         self.jump = 0
         self.super = 0
         self.start = 1
-        self.image.set_alpha(1)
     def update(self):
         global touch,have,refreshdown,refresh,ladder,haveladder,slimey,webgp,shield,havedark,reallevel
         if pause == False:
-
-            if self.start == 1:
-                pygame.time.delay(2)
-                self.image.set_alpha(1)
-                for i in range(127):
-                    self.image.set_alpha(i*2)
-                    pygame.time.delay(1)
-                    allsp.draw(screen)
-                    pygame.display.update()
-                self.start = 0
-                self.image.set_alpha(255)
 
             if refreshdown == False:
                 key = pygame.key.get_pressed()
@@ -324,22 +311,15 @@ class Dust(pygame.sprite.Sprite):
             self.rect.x = player.rect.centerx-30
         else:
             self.rect.x = player.rect.centerx+30
-        self.rect.y = player.rect.centery+random.randint(-10,10)
         self.time = 0
-        self.gg = 1
+        self.rect.y = player.rect.centery+random.randint(-10,10)
         self.image.set_alpha(100)
     def update(self):
-        self.gg = 1
-        for i in pygame.sprite.spritecollide(self,stonegp,False):
-            self.gg = 0
         self.time += 1
-        if self.time <= 50:
-            self.image.set_alpha(200-self.time*4)
-        else:
-            self.gg = 1
-        if self.gg == 1:
-            self.image.set_alpha(100)
+        self.image = pygame.transform.rotozoom(self.image,random.randint(-10,10),0.9)
+        if self.time >= 35:
             self.kill()
+
 def dust():
     if refreshdown == False:
         dust = Dust()
@@ -502,6 +482,7 @@ class Stone(pygame.sprite.Sprite):
                     if mouse_click[0] and haveslimey == 1 and carry == "slimey":
                         put_sd.play()
                         slimey.put = [self.rect.centerx,self.rect.centery]
+                        select.append("slimey")
                         haveslimey = 0
                         have.remove("slimey")
                         have2.remove("slimey")
@@ -509,9 +490,10 @@ class Stone(pygame.sprite.Sprite):
                     elif mouse_click[0] and haveladder == 1 and carry == "ladder":
                         put_sd.play()
                         ladder.put = [self.rect.centerx,self.rect.centery]
+                        select.append("ladder")
                         haveladder = 0
                         have.remove("ladder")
-                        have2.remove("ladder") 
+                        have2.remove("ladder")
                         time.sleep(0.1) 
                 else:
                     self.image.set_alpha(255)
@@ -703,8 +685,8 @@ class Box(pygame.sprite.Sprite):
                     have2.append("ladder")
                     self.remove()
     def remove(self):
-        time.sleep(2)
-        blit_scaled(self.image, self.rect.x, self.rect.y, self.rect.width, self.rect.height, wait_time=0.5)
+        time.sleep(1)
+        blit_scaled(self.image, self.rect.x, self.rect.y, self.rect.width, self.rect.height)
         for i in range(60):
             self.image.set_alpha(215 - i * 4)
             allsp.draw(screen)
@@ -886,11 +868,14 @@ class Potion(pygame.sprite.Sprite):
         self.rect.x = -100
         self.rect.y = -100
     def update(self):
-        global havepotion,havedark,select,carry
+        global havepotion,havedark,select,carry,W
         if pause == False:
             key = pygame.key.get_pressed()
             if havepotion == 1 and key[pygame.K_d] and havedark == 1 and carry == "potion":
                 draw_text("healing...", 30, W/2, 30, "red", 255)
+                W, H = realscreen.get_size()
+                scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+                realscreen.blit(scaled_screen, (0, 0))
                 pygame.display.flip()
                 pygame.time.delay(1000)
                 dark.time = 0
@@ -898,10 +883,13 @@ class Potion(pygame.sprite.Sprite):
                 select.append("potion")
                 have.remove("potion")
                 have2.remove("potion")
-                screen.blit(heal_img,(player.rect.x-20,player.rect.y-20))
                 magic_sd.play()
+                screen.blit(heal_img,(player.rect.x-20,player.rect.y-20))
+                W, H = realscreen.get_size()
+                scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+                realscreen.blit(scaled_screen, (0, 0))
                 pygame.display.flip()
-                pygame.time.delay(1000)
+                time.sleep(1)
             if havepotion == 1 and carry == "potion":
                 self.rect.centerx = player.rect.centerx
                 self.rect.centery = player.rect.centery
@@ -1046,11 +1034,14 @@ class Drink(pygame.sprite.Sprite):
         self.rect.x = -100
         self.rect.y = -100
     def update(self):
-        global havedrink,select,carry
+        global havedrink,select,carry,W
         if pause == False:
             key = pygame.key.get_pressed()
             if havedrink == 1 and key[pygame.K_d] and carry == "drink":
                 draw_text("Supermode starts.", 30, W/2, 30, "red", 255)
+                W, H = realscreen.get_size()
+                scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+                realscreen.blit(scaled_screen, (0, 0))
                 pygame.display.flip()
                 pygame.time.delay(1000)
                 player.super = 2
@@ -1059,10 +1050,13 @@ class Drink(pygame.sprite.Sprite):
                 select.append("drink")
                 have.remove("drink")
                 have2.remove("drink")
-                screen.blit(speed_img,(player.rect.x-20,player.rect.y-20))
                 magic_sd.play()
+                screen.blit(speed_img,(player.rect.x-20,player.rect.y-20))
+                W, H = realscreen.get_size()
+                scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+                realscreen.blit(scaled_screen, (0, 0))
                 pygame.display.flip()
-                pygame.time.delay(1000)
+                time.sleep(1)
                 
             if havedrink == 1 and carry == "drink":
                 self.rect.centerx = player.rect.centerx
@@ -1349,13 +1343,6 @@ while waiting:
     W, H = realscreen.get_size()
     scaled_screen = pygame.transform.smoothscale(screen, (W, H))
     realscreen.blit(scaled_screen, (0, 0))
-
-screen.fill("black")
-W, H = realscreen.get_size()
-draw_text("Loading...", 100, VIRTUAL_W // 2, VIRTUAL_H // 2, "white", 255)
-scaled_screen = pygame.transform.smoothscale(screen, (W, H))
-realscreen.blit(scaled_screen, (0, 0))
-pygame.display.flip()
 
 allsp = pygame.sprite.Group()
 stonegp = pygame.sprite.Group()

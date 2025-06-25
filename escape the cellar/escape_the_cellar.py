@@ -133,6 +133,7 @@ levelcol = (255,255,255)
 levelcolindex = 0
 touch = 0
 stand = 1
+
 havegun = 0
 haveshield = 0
 havepotion = 0
@@ -143,6 +144,7 @@ havescissors = 0
 havehammer = 0
 haveslimey = 0
 haveladder = 0
+
 have = []
 have1 = []
 have2 = []
@@ -153,6 +155,7 @@ instr = ""
 carry = ""
 refreshdown = False
 refreshtime = 0
+
 chra = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,4,4,4,4,4]
 
 font_name = os.path.join("escape the cellar","pixel_font.ttf")
@@ -202,6 +205,7 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         global touch,have,refreshdown,refresh,ladder,haveladder,slimey,webgp,shield,havedark,reallevel
         if pause == False:
+
             if self.start == 1:
                 pygame.time.delay(2)
                 self.image.set_alpha(1)
@@ -221,6 +225,7 @@ class Player(pygame.sprite.Sprite):
                 if key[pygame.K_UP] and (touch == 1 or self.rect.y > 750) and not (self.rect.colliderect(ladder.rect) and haveladder == 0) and not self.rect.colliderect(bigladder.rect):
                     self.jump = 1
                     touch = 0
+
                 if self.rect.colliderect(ladder.rect) and haveladder == 0:
                     if key[pygame.K_UP]:
                         climb_sd.play()
@@ -229,6 +234,7 @@ class Player(pygame.sprite.Sprite):
                         climb_sd.play()
                         self.rect.y += 5
                 else:
+
                     if key[pygame.K_LEFT]:
                         self.rect.x -= self.speed+self.super
                     if key[pygame.K_RIGHT]:
@@ -250,6 +256,7 @@ class Player(pygame.sprite.Sprite):
                         self.image.set_alpha(1)
                         refresh()
                         allsp.remove(self)
+
                     if self.rect.y > 760:
                         self.rect.y = 760
                     for _ in pygame.sprite.spritecollide(self,webgp,False):
@@ -1474,7 +1481,9 @@ while run:
     mouse_x, mouse_y = pygame.mouse.get_pos()
     virtual_mouse_x = mouse_x * VIRTUAL_W // W
     virtual_mouse_y = mouse_y * VIRTUAL_H // H
+
     mouse_click = pygame.mouse.get_pressed()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -1494,6 +1503,7 @@ while run:
         refreshtime = 0
         refreshdown = False
         time.sleep(0.1)
+
         for i in [bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
             allsp.remove(i)
         for i in [player,bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
@@ -1524,9 +1534,11 @@ while run:
     if refreshdown == False:
         draw_text(instr,15,700,785,"white",100)
     screen.blit(choose.image,(choose.rect.x,choose.rect.y))
+
     W, H = realscreen.get_size()
     scaled_screen = pygame.transform.smoothscale(screen, (W, H))
     realscreen.blit(scaled_screen, (0, 0))
+
     pygame.display.flip()
     clock.tick(60)
 

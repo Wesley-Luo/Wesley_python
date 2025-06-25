@@ -571,6 +571,9 @@ class Bomb(pygame.sprite.Sprite):
                         for i in range(60):
                             self.image.set_alpha(215-i*4)
                             allsp.draw(screen)
+                            W, H = realscreen.get_size()
+                            scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+                            realscreen.blit(scaled_screen, (0, 0))
                             pygame.display.flip()
                         self.image.set_alpha(255)
                         self.kill()
@@ -728,6 +731,9 @@ class Web(pygame.sprite.Sprite):
                     for i in range(60):
                         self.image.set_alpha(215-i*4)
                         allsp.draw(screen)
+                        W, H = realscreen.get_size()
+                        scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+                        realscreen.blit(scaled_screen, (0, 0))
                         pygame.display.flip()
                     self.rect.x = -100
                     self.rect.y = -100

@@ -350,7 +350,7 @@ class Bat(pygame.sprite.Sprite):
         self.fall = False
         self.speed = 10
     def update(self):
-        global allsp,player,bullet,haveshield,havedark
+        global allsp,player,bullet,haveshield,havedark,pausebutton
         if pause == False:
             if refreshdown == True:
                 self.kill()
@@ -388,21 +388,30 @@ class Bat(pygame.sprite.Sprite):
                     self.rect = self.image.get_rect()
                     self.rect.centerx = player.rect.centerx
                     self.rect.centery = player.rect.centery
-                    for i in range(100):
-                        self.image = pygame.transform.rotozoom(blood_img,0,1+i/70)
+                    for i in range(50):
+                        self.image = pygame.transform.rotozoom(blood_img, 0,1+i/35)
                         self.rect = self.image.get_rect()
                         self.rect.centerx = player.rect.centerx
                         self.rect.centery = player.rect.centery
                         allsp.draw(screen)
-                        pygame.time.delay(1)
+                        W, H = realscreen.get_size()
+                        scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+                        realscreen.blit(scaled_screen, (0, 0))
                         pygame.display.flip()
+                        pygame.time.delay(1)
                     for j in range(127):
-                        self.image.set_alpha(255-j*2)
+                        self.image.set_alpha(255 - j * 2)
                         allsp.draw(screen)
-                        pygame.time.delay(1)
+                        W, H = realscreen.get_size()
+                        scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+                        realscreen.blit(scaled_screen, (0, 0))
                         pygame.display.flip()
+                        pygame.time.delay(1)
                     havedark = 1
                     dark.time += 255
+                    allsp.remove(pausebutton)
+                    pausebutton = Pausebutton()
+                    allsp.add(pausebutton)
                     self.kill()
                 if self.rect.colliderect(bullet.rect) or self.rect.colliderect(shield.rect) and shield.shield == True:
                     if self.rect.colliderect(bullet.rect):
@@ -740,11 +749,11 @@ class Gun(pygame.sprite.Sprite):
         self.rect.x = -50
         self.rect.y = -50
     def update(self):
-        global havegun,mouse_pos,carry
+        global havegun,carry
         if pause == False:
             if havegun == 1 and carry == "gun":
                 self.rect.centery = player.rect.centery
-                if mouse_pos[0] >= player.rect.centerx:
+                if virtual_mouse_x >= player.rect.centerx:
                     self.image = gun2_img
                     self.rect.centerx = player.rect.centerx+30
                 else:
@@ -765,7 +774,7 @@ class Bullet(pygame.sprite.Sprite):
         self.spx = 0
         self.spy = 0
     def update(self):
-        global mouse_click,havegun,mouse_pos,carry
+        global mouse_click,havegun,carry
         if pause == False:
             if mouse_click[0] and havegun == 1 and self.shoot == 0 and carry == "gun"and not pygame.sprite.collide_rect(player,aim) and refreshdown == False:
                 shoot_sd.play()
@@ -790,11 +799,11 @@ class Aim(pygame.sprite.Sprite):
         self.rect.x = -200
         self.rect.y = -200
     def update(self):
-        global mouse_pos,havegun,carry
+        global havegun,carry
         if pause == False:
             if havegun == 1 and bullet.shoot == 0 and carry == "gun" and refreshdown == False:
-                self.rect.centerx = mouse_pos[0]
-                self.rect.centery = mouse_pos[1]
+                self.rect.centerx = virtual_mouse_x
+                self.rect.centery = virtual_mouse_y
             else:
                 self.rect.x = -200
                 self.rect.y = -200
@@ -900,7 +909,7 @@ class Poison(pygame.sprite.Sprite):
         self.time = 0
         self.smoke = False
     def update(self):
-        global havepoison,select,mouse_click,mouse_pos,have,have2,carry
+        global havepoison,select,mouse_click,have,have2,carry
         if pause == False:
             if havepoison == 1 and carry == "poison":
                 if self.shoot == 0 and self.smoke == False:
@@ -949,11 +958,11 @@ class Aim2(pygame.sprite.Sprite):
         self.rect.x = -200
         self.rect.y = -200
     def update(self):
-        global mouse_pos,havepoison,carry
+        global havepoison,carry
         if pause == False:
             if havepoison == 1 and poison.shoot == 0 and carry == "poison" and refreshdown == False:
-                self.rect.centerx = mouse_pos[0]
-                self.rect.centery = mouse_pos[1]
+                self.rect.centerx = virtual_mouse_x
+                self.rect.centery = virtual_mouse_y
             else:
                 self.rect.x = -200
                 self.rect.y = -200

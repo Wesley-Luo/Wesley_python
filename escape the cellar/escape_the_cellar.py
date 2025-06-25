@@ -11,7 +11,9 @@ H = 800
 TOTAL = 20
 setx = 50   
 sety = 0
-screen = pygame.display.set_mode((W,H))
+VIRTUAL_W, VIRTUAL_H = 1200, 800
+screen = pygame.Surface((VIRTUAL_W, VIRTUAL_H))
+realscreen = pygame.display.set_mode((W, H), pygame.RESIZABLE)
 pygame.display.set_caption("地窖逃生記")
 
 backpack_img = pygame.transform.scale(pygame.image.load(os.path.join("escape the cellar","backpack.png")),(50,380))
@@ -172,6 +174,17 @@ def win():
     time.sleep(7)
     pygame.quit()
     exit()
+
+def blit_scaled(img, x, y, w, h, wait_time=0.3):
+    W, H = realscreen.get_size()
+    scale_x = W / VIRTUAL_W
+    scale_y = H / VIRTUAL_H
+    scaled_img = pygame.transform.smoothscale(img, (int(w*scale_x), int(h*scale_y)))
+    scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+    realscreen.blit(scaled_screen, (0, 0))
+    realscreen.blit(scaled_img, (int(x*scale_x), int(y*scale_y)))
+    pygame.display.flip()
+    time.sleep(wait_time)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -518,19 +531,22 @@ class Bomb(pygame.sprite.Sprite):
                     self.rect.x -= 10
                     self.image = boom_img
                     boom_sd.play()
-                    for i in range(120):
-                        self.image.set_alpha(215-i*2)
+                    for i in range(80):
+                        self.image.set_alpha(215 - i * 3)
                         allsp.draw(screen)
+                        W, H = realscreen.get_size()
+                        scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+                        realscreen.blit(scaled_screen, (0, 0))
                         pygame.display.flip()
                     dead_img.set_alpha(215)
                     dun_sd.play()
                     if level < TOTAL:
-                        player.rect.centerx = W/2+20
-                        player.rect.y = 755
+                        player.rect.centerx = VIRTUAL_W // 2
+                        player.rect.y = 755 * VIRTUAL_H // 800
                     else:
-                        player.rect.centerx = 70
-                        player.rect.y = 705
-                    screen.blit(dead_img,(300,100))
+                        player.rect.centerx = 70 * VIRTUAL_W // 1200
+                        player.rect.y = 705 * VIRTUAL_H // 800
+                    blit_scaled(dead_img, 300, 100, 600, 550)
                     pygame.display.flip()
                     time.sleep(2)
                     dead_img.set_alpha(0)
@@ -598,7 +614,7 @@ class Box(pygame.sprite.Sprite):
                 if self.random == "gun":
                     select.remove("gun")
                     boxgun_img.set_alpha(215)
-                    screen.blit(boxgun_img,(300,100))
+                    blit_scaled(boxgun_img, 300, 100, 600, 600)
                     havegun = 1
                     have.append("gun")
                     have1.append("gun")
@@ -606,7 +622,7 @@ class Box(pygame.sprite.Sprite):
                 elif self.random == "shield":
                     select.remove("shield")
                     boxshield_img.set_alpha(215)
-                    screen.blit(boxshield_img,(300,100))
+                    blit_scaled(boxshield_img, 300, 100, 600, 600)
                     haveshield = 1
                     have.append("shield")
                     have1.append("shield")
@@ -614,7 +630,7 @@ class Box(pygame.sprite.Sprite):
                 elif self.random == "potion":
                     select.remove("potion")
                     boxpotion_img.set_alpha(215)
-                    screen.blit(boxpotion_img,(300,100))
+                    blit_scaled(boxpotion_img, 300, 100, 600, 600)
                     havepotion = 1
                     have.append("potion")
                     have2.append("potion")
@@ -622,7 +638,7 @@ class Box(pygame.sprite.Sprite):
                 elif self.random == "poison":
                     select.remove("poison")
                     boxpoison_img.set_alpha(215)
-                    screen.blit(boxpoison_img,(300,100))
+                    blit_scaled(boxpoison_img, 300, 100, 600, 600)
                     havepoison = 1
                     have.append("poison")
                     have2.append("poison")
@@ -630,7 +646,7 @@ class Box(pygame.sprite.Sprite):
                 elif self.random == "drink":
                     select.remove("drink")
                     boxdrink_img.set_alpha(215)
-                    screen.blit(boxdrink_img,(300,100))
+                    blit_scaled(boxdrink_img, 300, 100, 600, 600)
                     havedrink = 1
                     have.append("drink")
                     have2.append("drink")
@@ -638,7 +654,7 @@ class Box(pygame.sprite.Sprite):
                 elif self.random == "scissors":
                     select.remove("scissors")
                     scissors_img.set_alpha(215)
-                    screen.blit(boxscissors_img,(300,100))
+                    blit_scaled(boxscissors_img, 300, 100, 600, 600)
                     havescissors = 1
                     have.append("scissors")
                     have1.append("scissors")
@@ -646,7 +662,7 @@ class Box(pygame.sprite.Sprite):
                 elif self.random == "hammer":
                     select.remove("hammer")
                     scissors_img.set_alpha(215)
-                    screen.blit(boxhammer_img,(300,100))
+                    blit_scaled(boxhammer_img, 300, 100, 600, 600)
                     havehammer = 1
                     have.append("hammer")
                     have1.append("hammer")
@@ -654,7 +670,7 @@ class Box(pygame.sprite.Sprite):
                 elif self.random == "slimey":
                     select.remove("slimey")
                     slimey_img.set_alpha(215)
-                    screen.blit(boxslimey_img,(300,100))
+                    blit_scaled(boxslimey_img, 300, 100, 600, 600)
                     haveslimey = 1
                     have.append("slimey")
                     have2.append("slimey")
@@ -662,17 +678,20 @@ class Box(pygame.sprite.Sprite):
                 elif self.random == "ladder":
                     select.remove("ladder")
                     slimey_img.set_alpha(215)
-                    screen.blit(boxladder_img,(300,100))
+                    blit_scaled(boxladder_img, 300, 100, 600, 600)
                     haveladder = 1
                     have.append("ladder")
                     have2.append("ladder")
                     self.remove()
     def remove(self):
-        pygame.display.update()
-        time.sleep(1.5)
-        for i in range(120):
-            self.image.set_alpha(215-i*2)
+        time.sleep(2)
+        blit_scaled(self.image, self.rect.x, self.rect.y, self.rect.width, self.rect.height, wait_time=0.5)
+        for i in range(60):
+            self.image.set_alpha(215 - i * 4)
             allsp.draw(screen)
+            W, H = realscreen.get_size()
+            scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+            realscreen.blit(scaled_screen, (0, 0))
             pygame.display.flip()
         self.kill()
 
@@ -1142,6 +1161,12 @@ class Bigladder(pygame.sprite.Sprite):
         self.rect.x = 1100
         self.rect.y = -800
     def update(self):
+        W, H = realscreen.get_size()
+        scale_x = W / VIRTUAL_W
+        scale_y = H / VIRTUAL_H
+        self.image = pygame.transform.smoothscale(bigladder_img, (int(50*scale_x), int(750*scale_y)))
+        bigladder.rect.width = int(50*scale_x)
+        bigladder.rect.height = int(750*scale_y)
         if pause == False:
             if refreshdown == True:
                 self.rect.y += 2
@@ -1165,7 +1190,7 @@ class Pausebutton(pygame.sprite.Sprite):
     def update(self):
         global pause
         if self.pause == False:
-            if self.rect.collidepoint(pygame.mouse.get_pos()):
+            if self.rect.collidepoint(virtual_mouse_x, virtual_mouse_y):
                 self.image = pause1_2_img
                 self.rect = self.image.get_rect()
                 if pygame.mouse.get_pressed()[0]:
@@ -1176,7 +1201,7 @@ class Pausebutton(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()
                 
         elif self.pause == True:
-            if self.rect.collidepoint(pygame.mouse.get_pos()):
+            if self.rect.collidepoint(virtual_mouse_x, virtual_mouse_y):
                 self.image = pause2_2_img
                 self.rect = self.image.get_rect()
                 if pygame.mouse.get_pressed()[0]:
@@ -1197,8 +1222,8 @@ class Button(pygame.sprite.Sprite):
         self.rect.centerx = 537
         self.rect.centery = 670
     def update(self):
-        global press
-        if self.rect.collidepoint(pygame.mouse.get_pos()):
+        global press,virtual_mouse_x,virtual_mouse_y
+        if self.rect.collidepoint(virtual_mouse_x, virtual_mouse_y):
             self.rect.centery = 675
             self.image = start2_img
             if pygame.mouse.get_pressed()[0] and press == False:
@@ -1279,11 +1304,16 @@ start.add(button)
 
 pygame.mixer.music.play(-1)
 
-screen.blit(start_img, (0,0))
+realscreen.blit(start_img, (0,0))
 pygame.display.update()
 waiting = True
 while waiting:
     pygame.display.update()
+
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    virtual_mouse_x = mouse_x * VIRTUAL_W // W
+    virtual_mouse_y = mouse_y * VIRTUAL_H // H
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             waiting = False
@@ -1294,6 +1324,16 @@ while waiting:
     screen.blit(start_img, (0,0))
     start.update()
     start.draw(screen)
+    W, H = realscreen.get_size()
+    scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+    realscreen.blit(scaled_screen, (0, 0))
+
+screen.fill("black")
+W, H = realscreen.get_size()
+draw_text("Loading...", 100, VIRTUAL_W // 2, VIRTUAL_H // 2, "white", 255)
+scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+realscreen.blit(scaled_screen, (0, 0))
+pygame.display.flip()
 
 allsp = pygame.sprite.Group()
 stonegp = pygame.sprite.Group()
@@ -1412,11 +1452,13 @@ choose = Choose()
 run = True
 bat = Bat()
 allsp.add(bat)
-player.rect.centerx = W/2+20
-player.rect.y = 755
+player.rect.centerx = VIRTUAL_W // 2
+player.rect.y = 755 * VIRTUAL_H // 800
 while run:
 
-    mouse_pos = pygame.mouse.get_pos()
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    virtual_mouse_x = mouse_x * VIRTUAL_W // W
+    virtual_mouse_y = mouse_y * VIRTUAL_H // H
     mouse_click = pygame.mouse.get_pressed()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -1439,15 +1481,14 @@ while run:
         time.sleep(0.1)
         for i in [bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
             allsp.remove(i)
-            i.kill()
         for i in [player,bat,shield,gun,scissors,hammer,dark,bullet,potion,drink,poison,aim,aim2,ladder,slimey,pausebutton]:
             allsp.add(i)
         if reallevel == TOTAL:
-            player.rect.centerx = 70
-            player.rect.y = 705
+            player.rect.centerx = 70 * VIRTUAL_W // 1200
+            player.rect.y = 705 * VIRTUAL_H // 800
         else:
-            player.rect.centerx = W/2+20
-            player.rect.y = 755
+            player.rect.centerx = VIRTUAL_W // 2
+            player.rect.y = 755 * VIRTUAL_H // 800
 
     if pause == False:
         levelcolindex += 0.1
@@ -1468,6 +1509,9 @@ while run:
     if refreshdown == False:
         draw_text(instr,15,700,785,"white",100)
     screen.blit(choose.image,(choose.rect.x,choose.rect.y))
+    W, H = realscreen.get_size()
+    scaled_screen = pygame.transform.smoothscale(screen, (W, H))
+    realscreen.blit(scaled_screen, (0, 0))
     pygame.display.flip()
     clock.tick(60)
 
